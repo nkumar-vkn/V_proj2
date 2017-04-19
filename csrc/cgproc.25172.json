@@ -1,0 +1,40 @@
+{
+    "Modules": {
+        "...MASTER...": {},
+        "TOP_ctl": {
+            "Compiled": "Yes",
+            "Compiled Times": 17
+        },
+        "MUX21H": {}
+    },
+    "CompUnits": {
+        "amcQw_d": {
+            "checksum": 4294967295,
+            "mod": "...MASTER...",
+            "mode": 4,
+            "out": "objs/amcQw_d.o",
+            "bytes": 7266
+        },
+        "z8j0x_d": {
+            "checksum": 4294967295,
+            "mod": "TOP_ctl",
+            "mode": 4,
+            "out": "z8j0x_d.o",
+            "bytes": 1761855,
+            "archive": "archive.31/_25172_archive_1.a"
+        }
+    },
+    "reusePaths": {},
+    "ObjArchives": [
+        {
+            "archive": "archive.31/_25172_archive_1.a",
+            "objects": [
+                [
+                    "z8j0x_d.o",
+                    1761855
+                ]
+            ],
+            "size": 1761855
+        }
+    ]
+}
