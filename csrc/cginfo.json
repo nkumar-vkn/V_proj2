@@ -1,84 +1,57 @@
 {
+    "CompileProcesses": [
+        "cgproc.479.json"
+    ],
+    "CompileStrategy": "fullobj",
     "MlibObjs": {},
     "PrevCompiledModules": {
         "MUX21H": {
             "nd3Qq_d": {
-                "bytes": 8541,
+                "bytes": 7133,
                 "checksum": 4294967295,
                 "mod": "MUX21H",
-                "out": "nd3Qq_d.o",
                 "mode": 4,
-                "archive": "archive.31/_prev_archive_1.a"
+                "archive": "archive.54/_prev_archive_1.a",
+                "out": "nd3Qq_d.o"
             }
         },
-        "TOP_ctl": {
-            "z8j0x_d": {
-                "bytes": 1761855,
+        "scan_dff": {
+            "PMpaD_d": {
+                "bytes": 7076,
                 "checksum": 4294967295,
-                "mod": "TOP_ctl",
+                "mod": "scan_dff",
                 "mode": 4,
-                "out": "z8j0x_d.o",
-                "archive": "archive.31/_25172_archive_1.a"
+                "archive": "archive.54/_prev_archive_1.a",
+                "out": "PMpaD_d.o"
             }
         },
         "...MASTER...": {
             "amcQw_d": {
-                "bytes": 7266,
+                "bytes": 7093,
                 "checksum": 4294967295,
                 "mod": "...MASTER...",
+                "out": "objs/amcQw_d.o",
+                "mode": 4
+            }
+        },
+        "TOP_ctl": {
+            "z8j0x_d": {
+                "bytes": 365730,
+                "checksum": 4294967295,
+                "mod": "TOP_ctl",
+                "out": "z8j0x_d.o",
                 "mode": 4,
-                "out": "objs/amcQw_d.o"
+                "archive": "archive.54/_479_archive_1.a"
             }
         }
     },
-    "stat": {
-        "ru_self_cgstart": {
-            "ru_utime_sec": 0.31495200000000001,
-            "ru_stime_sec": 0.038994000000000001,
-            "ru_majflt": 0,
-            "ru_minflt": 15198,
-            "ru_maxrss_kb": 59352,
-            "ru_nvcsw": 265,
-            "ru_nivcsw": 81
-        },
-        "nQuads": 48086,
-        "ru_childs_cgstart": {
-            "ru_utime_sec": 0.0029989999999999999,
-            "ru_stime_sec": 0.0019989999999999999,
-            "ru_majflt": 0,
-            "ru_minflt": 1833,
-            "ru_maxrss_kb": 17764,
-            "ru_nvcsw": 23,
-            "ru_nivcsw": 13
-        },
-        "mopSpeed": 129728.97338403041,
-        "nMops": 106621,
-        "CodeGen(%)": 72.295520778447383,
-        "ru_self_end": {
-            "ru_utime_sec": 1.136827,
-            "ru_stime_sec": 0.066989000000000007,
-            "ru_majflt": 0,
-            "ru_minflt": 22388,
-            "ru_maxrss_kb": 82104,
-            "ru_nvcsw": 488,
-            "ru_nivcsw": 400
-        },
-        "Frontend(%)": 27.704479221552621,
-        "totalObjSize": 1862827,
-        "outputSizePerQuad": 38.0,
-        "ru_childs_end": {
-            "ru_utime_sec": 0.0029989999999999999,
-            "ru_stime_sec": 0.0019989999999999999,
-            "ru_majflt": 0,
-            "ru_minflt": 1833,
-            "ru_maxrss_kb": 17764,
-            "ru_nvcsw": 23,
-            "ru_nivcsw": 13
-        },
-        "quadSpeed": 58507.680608365015,
-        "mop/quad": 2.2172981741047288
-    },
+    "CompileStatus": "Successful",
     "NameTable": {
+        "...MASTER...": [
+            "SIM",
+            "amcQw",
+            "module"
+        ],
         "TOP_ctl": [
             "TOP_ctl",
             "z8j0x",
@@ -89,37 +62,79 @@
             "nd3Qq",
             "module"
         ],
-        "...MASTER...": [
-            "SIM",
-            "amcQw",
+        "scan_dff": [
+            "scan_dff",
+            "PMpaD",
             "module"
         ]
+    },
+    "SIMBData": {
+        "out": "amcQwB.o",
+        "bytes": 63074
     },
     "CurCompileModules": [
         "...MASTER...",
         "TOP_ctl"
     ],
-    "CompileStrategy": "fullobj",
-    "CurCompileUdps": {},
-    "SIMBData": {
-        "out": "amcQwB.o",
-        "bytes": 93706
+    "PEModules": [],
+    "stat": {
+        "ru_self_cgstart": {
+            "ru_nivcsw": 139,
+            "ru_nvcsw": 192,
+            "ru_utime_sec": 0.342947,
+            "ru_stime_sec": 0.028995,
+            "ru_maxrss_kb": 55524,
+            "ru_majflt": 0,
+            "ru_minflt": 12918
+        },
+        "totalObjSize": 435897,
+        "nQuads": 13483,
+        "ru_childs_cgstart": {
+            "ru_nivcsw": 0,
+            "ru_nvcsw": 0,
+            "ru_utime_sec": 0.0,
+            "ru_stime_sec": 0.0,
+            "ru_maxrss_kb": 0,
+            "ru_majflt": 0,
+            "ru_minflt": 0
+        },
+        "nMops": 31615,
+        "ru_self_end": {
+            "ru_nivcsw": 269,
+            "ru_nvcsw": 306,
+            "ru_utime_sec": 0.66489799999999999,
+            "ru_stime_sec": 0.040993000000000002,
+            "ru_maxrss_kb": 66464,
+            "ru_majflt": 0,
+            "ru_minflt": 15830
+        },
+        "ru_childs_end": {
+            "ru_nivcsw": 0,
+            "ru_nvcsw": 0,
+            "ru_utime_sec": 0.0,
+            "ru_stime_sec": 0.0,
+            "ru_maxrss_kb": 0,
+            "ru_majflt": 0,
+            "ru_minflt": 0
+        },
+        "outputSizePerQuad": 32.0,
+        "mopSpeed": 98198.173013905849,
+        "quadSpeed": 41879.043705408585,
+        "mop/quad": 2.3448045687161612,
+        "Frontend(%)": 51.578888791965085,
+        "CodeGen(%)": 48.421111208034915
     },
+    "CurCompileUdps": {},
     "LVLData": [
         "SIM"
     ],
-    "CompileStatus": "Successful",
-    "PEModules": [],
-    "CompileProcesses": [
-        "cgproc.25172.json"
-    ],
     "Misc": {
-        "cwd": "/home/ecelrc/students/nkumar1/Desktop/vlsi_t/proj_2/project2",
-        "archive_dir": "archive.31",
-        "csrc": "csrc",
-        "csrc_abs": "/home/ecelrc/students/nkumar1/Desktop/vlsi_t/proj_2/project2/csrc",
         "daidir": "simv.daidir",
-        "daidir_abs": "/home/ecelrc/students/nkumar1/Desktop/vlsi_t/proj_2/project2/simv.daidir",
-        "default_output_dir": "csrc"
+        "cwd": "/home/ecelrc/students/raggarwal1/testing/V_proj2",
+        "default_output_dir": "csrc",
+        "csrc": "csrc",
+        "csrc_abs": "/home/ecelrc/students/raggarwal1/testing/V_proj2/csrc",
+        "daidir_abs": "/home/ecelrc/students/raggarwal1/testing/V_proj2/simv.daidir",
+        "archive_dir": "archive.54"
     }
 }

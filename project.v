@@ -1,5 +1,4 @@
 `define TOT_CYC 20'd530000
-//`define TOT_CYC 20'd100000
 // 2000*263 + 2000 + 2000
 `define log_TOT_CYC 20
 
@@ -7,7 +6,7 @@
 //35(ip)+179(DFF)+49(op)+1
 `define log_SING_CYC 9
 
-`define GOLDEN_ANS 16'b0001_1001_1000_0001 
+`define GOLDEN_ANS 16'b0100_1010_0101_0111
 
 module bist_hardware(clk,rst,bistmode,bistdone,bistpass,cut_scanmode,
                      cut_sdi,cut_sdo);
@@ -25,208 +24,151 @@ reg cut_scanmode;
 reg bistdone;
 reg bistpass;
 
-reg LFSR[16:1];
-reg LFSR_sig[16:1];
-reg [`log_SING_CYC:0]  s_cyc_count;
-reg [`log_TOT_CYC:0]  t_cyc_count;
+reg [16:1] LFSR;
+reg [16:1] MISR;
+reg [`log_SING_CYC:0] s_cyc_count;
+reg [`log_TOT_CYC:0] t_cyc_count;
 
 integer i;
 reg firstscan;
+reg MISR_en;
 
-reg LFSR_sig_en;
-reg LFSR_en;
+//initialize all signals & counters
+initial begin
+    LFSR = 16'hFFFF;
+	MISR = 16'h0;
 
-initial
-begin
-	for (i=1; i<=16; i=i+1) 
-	begin
-		LFSR[i] = 1'b1;
-		LFSR_sig[i] = 1'b0;
-	end
-	s_cyc_count = 6'd1;
+    s_cyc_count = 6'd1;
 	t_cyc_count = 11'd1;
-     bistdone    = 0;
-     bistpass    = 0;
-     cut_scanmode= 0;
-
-	LFSR_en = 1 ; //hardcoded 
+    bistdone = 0;
+    bistpass = 0;
+    cut_scanmode = 0;
 end
 
 assign cut_sdi = LFSR[1];
 
-always @ (negedge clk) LFSR_sig_en <= cut_scanmode & ~firstscan;
+always @ (negedge clk) MISR_en <= cut_scanmode & ~firstscan;
 
-always @ (posedge clk)
-begin
-  if (t_cyc_count == (`TOT_CYC - 1) )
-  begin
-    $display("\n ");
-    $display("%b %b %b %b %b %b %b %b %b %b %b %b %b %b %b %b ",LFSR_sig[1],LFSR_sig[2],LFSR_sig[3],LFSR_sig[4],LFSR_sig[5],LFSR_sig[6],LFSR_sig[7],LFSR_sig[8],LFSR_sig[9],LFSR_sig[10],LFSR_sig[11],LFSR_sig[12],LFSR_sig[13],LFSR_sig[14],LFSR_sig[15],LFSR_sig[16]);
-    if ({LFSR_sig[1],LFSR_sig[2],LFSR_sig[3],LFSR_sig[4],LFSR_sig[5],LFSR_sig[6],LFSR_sig[7],LFSR_sig[8],LFSR_sig[9],LFSR_sig[10],LFSR_sig[11],LFSR_sig[12],LFSR_sig[13],LFSR_sig[14],LFSR_sig[15],LFSR_sig[16]} == `GOLDEN_ANS)
-    bistpass <= 1;
-    else bistpass <= 0;
-  end
-  else bistpass <= 0;
+always @ (posedge clk) begin
+    if (t_cyc_count == `TOT_CYC) begin   //Check for output mismatch
+        $display("Output Sig: %b Golden Sig: %b",MISR, `GOLDEN_ANS);
+        if (MISR == `GOLDEN_ANS)
+            bistpass <= 1;
+        else 
+            bistpass <= 0;
+    end
+    else 
+        bistpass <= 0;
 end
 
-always @ (posedge clk)
-begin
-  if(~rst)
-  begin
-    if (t_cyc_count < (`SING_CYC -1) ) firstscan <= 1;
-    else firstscan <= 0;
-  end
-  else firstscan <= 1;
+always @ (posedge clk) begin
+    if(~rst) begin
+        if (t_cyc_count < (`SING_CYC -1) ) 
+            firstscan <= 1;
+        else 
+            firstscan <= 0;
+    end
+    else 
+        firstscan <= 1;
 end
 
-always @ (posedge clk) //not completely necessary 
-begin
-  //if((s_cyc_count < 13) || (s_cyc_count == 48) || (s_cyc_count == 49)) LFSR_en <= 0;
-  if(s_cyc_count == (`SING_CYC - 1)) LFSR_en <= 0;
-  else LFSR_en <= 1;
+//Counters
+always @ (posedge clk) begin
+    if (~rst) begin
+        if (bistmode) begin
+  	        if (s_cyc_count != `SING_CYC) 
+                s_cyc_count <= s_cyc_count + 1;
+  	        else 
+                s_cyc_count <= 1;
+
+  	        if (t_cyc_count != `TOT_CYC) 
+                t_cyc_count <= t_cyc_count + 1;
+  	        else 
+                t_cyc_count <= 1;
+  	    end
+  	    else begin
+            s_cyc_count <= s_cyc_count;
+            t_cyc_count <= t_cyc_count;
+  	    end
+    end
+    else begin
+        s_cyc_count <= 1;
+        t_cyc_count <= 1;
+    end
 end
 
-always @ (posedge clk) //counters
-begin
-  if (~rst)
-  begin
-     if (bistmode)
-  	begin
-  	   if (s_cyc_count != `SING_CYC) s_cyc_count <= s_cyc_count + 1;
-  	   else s_cyc_count <= 1;
+//ScanMode
+always @ (posedge clk) begin
+    if ((~rst) && (bistmode)) begin
+	    if (s_cyc_count == (`SING_CYC - 1)) 
+            cut_scanmode <= 0; 
+	    else 
+            cut_scanmode <= 1;
+    end
+    else 
+        cut_scanmode <= 0;   //Shouldn't this be zero?
+end
 
-  	   if (t_cyc_count != `TOT_CYC) t_cyc_count <= t_cyc_count + 1;
-  	   else t_cyc_count <= 1;
-  	end
-  	else
-  	begin
-        s_cyc_count <= s_cyc_count;
-  	   t_cyc_count <= t_cyc_count;
-  	end
+//BistDone
+always @ (posedge clk) begin
+    if ((~rst) && (bistmode)) begin
+	    if (t_cyc_count == `TOT_CYC ) 
+            bistdone <= 1;
+	    else 
+            bistdone <= 0;
+    end
+    else 
+        bistdone <= 0;
+end
+
+//LFSR Generator
+always @ (posedge (clk & cut_scanmode)) begin
+    if ((~rst) && (bistmode)) begin
+	    LFSR[16] <= LFSR[1];
+	    LFSR[15] <= LFSR[16];
+	    LFSR[14] <= LFSR[15];
+	    LFSR[13] <= LFSR[14];
+	    LFSR[12] <= LFSR[13];
+	    LFSR[11] <= LFSR[12];
+	    LFSR[10] <= LFSR[11];
+	    LFSR[9]  <= LFSR[10];
+	    LFSR[8]  <= LFSR[9];
+	    LFSR[7]  <= LFSR[8];
+	    LFSR[6]  <= LFSR[7];
+	    LFSR[5]  <= LFSR[6] ^ LFSR[1];
+	    LFSR[4]  <= LFSR[5] ^ LFSR[1];
+	    LFSR[3]  <= LFSR[4] ^ LFSR[1];
+	    LFSR[2]  <= LFSR[3];
+	    LFSR[1]  <= LFSR[2];
   end
   else
-  begin
-  	s_cyc_count <= 1;
-     t_cyc_count <= 1;
-  end
-
+        LFSR <= 16'hFFFF;
 end
 
-always @ (posedge clk) //scanmode
-begin
-  if ((~rst)&&(bistmode))
-  begin
-	if (s_cyc_count == (`SING_CYC - 1)) cut_scanmode = 0; 
-	else cut_scanmode = 1;
-  end
-  else cut_scanmode = 1;
-end
-
-always @ (posedge clk) //bistdone
-begin
-  if ((~rst)&&(bistmode))
-  begin
-	if (t_cyc_count == `TOT_CYC ) bistdone = 1;
-	else bistdone = 0;
-  end
-  else bistdone = 0;
-end
-
-always @ (posedge clk) //bist_pass to be completed
-begin
-  bistpass <= 0;
-end
-
-always @ (posedge (clk & cut_scanmode) ) //LFSR generator
-begin
-  if ((~rst)&&(bistmode))
-  begin
-    if (LFSR_en)
-    begin
-		LFSR[16] <= LFSR[1];
-		LFSR[15] <= LFSR[16];
-		LFSR[14] <= LFSR[15];
-		LFSR[13] <= LFSR[14];
-		LFSR[12] <= LFSR[13];
-		LFSR[11] <= LFSR[12];
-		LFSR[10] <= LFSR[11];
-		LFSR[9]  <= LFSR[10];
-		LFSR[8]  <= LFSR[9];
-		LFSR[7]  <= LFSR[8];
-		LFSR[6]  <= LFSR[7];
-		LFSR[5]  <= LFSR[6] ^ LFSR[1];
-		LFSR[4]  <= LFSR[5] ^ LFSR[1];
-		LFSR[3]  <= LFSR[4] ^ LFSR[1];
-		LFSR[2]  <= LFSR[3];
-		LFSR[1]  <= LFSR[2];
-	end
-	else
-	begin
-		LFSR[16] <= LFSR[16]; 
-		LFSR[15] <= LFSR[15];
-		LFSR[14] <= LFSR[14];
-		LFSR[13] <= LFSR[13];
-		LFSR[12] <= LFSR[12];
-		LFSR[11] <= LFSR[11];
-		LFSR[10] <= LFSR[10];
-		LFSR[9]  <= LFSR[9] ;
-		LFSR[8]  <= LFSR[8] ;
-		LFSR[7]  <= LFSR[7] ;
-		LFSR[6]  <= LFSR[6] ;
-		LFSR[5]  <= LFSR[5] ; 
-		LFSR[4]  <= LFSR[4] ; 
-		LFSR[3]  <= LFSR[3] ; 
-		LFSR[2]  <= LFSR[2] ;
-		LFSR[1]  <= LFSR[1] ;
-	end
-  end
-  else for (i=1; i<=16; i=i+1) LFSR[i] = 1'b1;
-end
-
-always @ (posedge (clk) ) //LFSR sig_gen
-begin
-  if ((~rst)&&(bistmode))
-  begin
-	if (LFSR_sig_en)
-	begin
-		LFSR_sig[16] <= LFSR_sig[1] ^ cut_sdo;
-		LFSR_sig[15] <= LFSR_sig[16];
-		LFSR_sig[14] <= LFSR_sig[15];
-		LFSR_sig[13] <= LFSR_sig[14];
-		LFSR_sig[12] <= LFSR_sig[13];
-		LFSR_sig[11] <= LFSR_sig[12];
-		LFSR_sig[10] <= LFSR_sig[11];
-		LFSR_sig[9]  <= LFSR_sig[10];
-		LFSR_sig[8]  <= LFSR_sig[9];
-		LFSR_sig[7]  <= LFSR_sig[8];
-		LFSR_sig[6]  <= LFSR_sig[7];
-		LFSR_sig[5]  <= LFSR_sig[6] ^ LFSR_sig[1];
-		LFSR_sig[4]  <= LFSR_sig[5] ^ LFSR_sig[1];
-		LFSR_sig[3]  <= LFSR_sig[4] ^ LFSR_sig[1];
-		LFSR_sig[2]  <= LFSR_sig[3];
-		LFSR_sig[1]  <= LFSR_sig[2];
-	end
-    else
-    begin
-	   LFSR_sig[16] <= LFSR_sig[16]; 
-	   LFSR_sig[15] <= LFSR_sig[15];
-	   LFSR_sig[14] <= LFSR_sig[14];
-	   LFSR_sig[13] <= LFSR_sig[13];
-	   LFSR_sig[12] <= LFSR_sig[12];
-	   LFSR_sig[11] <= LFSR_sig[11];
-	   LFSR_sig[10] <= LFSR_sig[10];
-	   LFSR_sig[9]  <= LFSR_sig[9] ;
-	   LFSR_sig[8]  <= LFSR_sig[8] ;
-	   LFSR_sig[7]  <= LFSR_sig[7] ;
-	   LFSR_sig[6]  <= LFSR_sig[6] ;
-	   LFSR_sig[5]  <= LFSR_sig[5] ; 
-	   LFSR_sig[4]  <= LFSR_sig[4] ; 
-	   LFSR_sig[3]  <= LFSR_sig[3] ; 
-	   LFSR_sig[2]  <= LFSR_sig[2] ;
-	   LFSR_sig[1]  <= LFSR_sig[1] ;
+//MISR Generator
+always @ (posedge (clk) ) begin
+    if ((~rst) && (bistmode)) begin
+	    if (MISR_en) begin
+		    MISR[16] <= MISR[1] ^ cut_sdo;
+		    MISR[15] <= MISR[16];
+		    MISR[14] <= MISR[15];
+		    MISR[13] <= MISR[14];
+		    MISR[12] <= MISR[13];
+		    MISR[11] <= MISR[12];
+		    MISR[10] <= MISR[11];
+		    MISR[9]  <= MISR[10];
+		    MISR[8]  <= MISR[9];
+		    MISR[7]  <= MISR[8];
+		    MISR[6]  <= MISR[7];
+		    MISR[5]  <= MISR[6] ^ MISR[1];
+		    MISR[4]  <= MISR[5] ^ MISR[1];
+		    MISR[3]  <= MISR[4] ^ MISR[1];
+		    MISR[2]  <= MISR[3];
+		    MISR[1]  <= MISR[2];
+	    end
     end
-  end
-  else begin for(i=1; i<=16; i=i+1) LFSR_sig[i] = 1'b0; end
+    else 
+        MISR <= 16'h0;
 end
 endmodule  
 

@@ -1,4 +1,9 @@
 {
+    "...MASTER...": [
+        "SIM",
+        "amcQw",
+        "module"
+    ],
     "TOP_ctl": [
         "TOP_ctl",
         "z8j0x",
@@ -9,9 +14,9 @@
         "nd3Qq",
         "module"
     ],
-    "...MASTER...": [
-        "SIM",
-        "amcQw",
+    "scan_dff": [
+        "scan_dff",
+        "PMpaD",
         "module"
     ]
 }

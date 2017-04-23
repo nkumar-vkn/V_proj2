@@ -1,2 +1,8 @@
 
 *.swp
+simv
+ucli.key
+simv*/*
+DVEfiles/*
+csrc/*
+.nfs*
